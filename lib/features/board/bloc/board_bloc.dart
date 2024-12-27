@@ -50,7 +50,11 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
 
       // Kiểm tra nước đi hợp lệ
       if (!MoveValidator.instance.isValidMove(
-          state.selectedSquare!, event.selectedSquare, state.playerTurn)) {
+        state.selectedSquare!,
+        event.selectedSquare,
+        state.playerTurn,
+        state.board,
+      )) {
         return;
       }
 
