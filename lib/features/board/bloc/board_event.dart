@@ -1,7 +1,7 @@
 part of 'board_bloc.dart';
 
 /// Sự kiện cho [BoardBloc]
-abstract class BoardEvent extends Equatable {
+sealed class BoardEvent extends Equatable {
   const BoardEvent();
 
   @override
@@ -21,21 +21,4 @@ class SquareTappedEvent extends BoardEvent {
 
   @override
   List<Object?> get props => [selectedSquare];
-}
-
-/// Sự kiện để di chuyển một quân cờ từ ô này sang ô khác
-class MovePieceEvent extends BoardEvent {
-  final SquareModel from;
-  final SquareModel to;
-
-  const MovePieceEvent({
-    required this.from,
-    required this.to,
-  });
-
-  @override
-  List<Object?> get props => [from, to];
-
-  @override
-  String toString() => 'MovePieceEvent(from: $from, to: $to)';
 }

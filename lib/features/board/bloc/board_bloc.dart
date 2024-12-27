@@ -1,9 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:zenchess/features/board/models/piece_model.dart';
 
 import '../models/board_model.dart';
 import '../models/square_model.dart';
+import '../models/move_validator.dart';
 
 part 'board_event.dart';
 part 'board_state.dart';
@@ -13,7 +13,6 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
   BoardBloc() : super(const BoardState()) {
     on<LoadBoardEvent>(_onLoadBoard);
     on<SquareTappedEvent>(_onSquareTapped);
-    on<MovePieceEvent>(_onMovePiece);
   }
 
   /// Xử lý sự kiện LoadBoardEvent
@@ -28,39 +27,68 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
 
   /// Xử lý sự kiện SquareTappedEvent
   void _onSquareTapped(SquareTappedEvent event, Emitter<BoardState> emit) {
-    print(event.selectedSquare);
-    final currentSquare = event.selectedSquare;
+    final selectedSquare = event.selectedSquare;
 
-    if (state.selectedSquare != null) {
+    // Trường hợp chọn quân cờ
+    if ((state.selectedSquare != null &&
+            state.selectedSquare!.piece != null &&
+            selectedSquare.hasPiece &&
+            selectedSquare.piece!.color.name == state.playerTurn.name) ||
+        ((state.selectedSquare == null ||
+                state.selectedSquare?.piece == null) &&
+            selectedSquare.hasPiece &&
+            selectedSquare.piece!.color.name == state.playerTurn.name)) {
+      emit(state.copyWith(selectedSquare: selectedSquare));
+    } else if ((state.selectedSquare != null &&
+            state.selectedSquare!.piece != null &&
+            selectedSquare.hasPiece &&
+            selectedSquare.piece!.color.name != state.playerTurn.name) ||
+        (!selectedSquare.hasPiece &&
+            state.selectedSquare != null &&
+            state.selectedSquare!.piece != null)) {
+      // Trường hợp đi quân cờ
+
+      // Kiểm tra nước đi hợp lệ
+      if (!MoveValidator.instance.isValidMove(
+          state.selectedSquare!, event.selectedSquare, state.playerTurn)) {
+        return;
+      }
+
       // Thực hiện nước đi
-      BoardModel board = state.board;
-      // Cập nhật fromSquare
-      board = board.updateSquare(
-        SquareModel(
-          row: state.selectedSquare!.row,
-          column: state.selectedSquare!.column,
-          color: state.selectedSquare!.color,
-          piece: null,
+      BoardModel newBoard =
+          _onMovingPiece(state.selectedSquare!, event.selectedSquare);
+
+      emit(
+        state.copyWith(
+          board: newBoard,
+          selectedSquare: null,
+          playerTurn: state.playerTurn == PlayerTurn.white
+              ? PlayerTurn.black
+              : PlayerTurn.white,
         ),
       );
-      // Cập nhật toSquare
-      board = board.updateSquare(SquareModel(
-          row: currentSquare.row,
-          column: currentSquare.column,
-          color: currentSquare.color,
-          piece: state.selectedSquare!.piece!));
-
-      emit(state.copyWith(
-        board: board,
-        selectedSquare: null,
-      ));
-    } else if (currentSquare.hasPiece) {
-      // Chọn quân cờ
-      emit(state.copyWith(selectedSquare: currentSquare));
-      print('Đã chọn quân cờ ${currentSquare.piece?.type}');
     }
   }
 
-  /// Xử lý sự kiện MovePieceEvent
-  void _onMovePiece(MovePieceEvent event, Emitter<BoardState> emit) {}
+  // Thực hiện nước đi
+  BoardModel _onMovingPiece(SquareModel fromSquare, SquareModel toSquare) {
+    BoardModel board = state.board;
+    // Cập nhật fromSquare
+    board = board.updateSquare(
+      SquareModel(
+        row: fromSquare.row,
+        column: fromSquare.column,
+        color: fromSquare.color,
+        piece: null,
+      ),
+    );
+    // Cập nhật toSquare
+    board = board.updateSquare(SquareModel(
+        row: toSquare.row,
+        column: toSquare.column,
+        color: toSquare.color,
+        piece: state.selectedSquare!.piece!));
+
+    return board;
+  }
 }
