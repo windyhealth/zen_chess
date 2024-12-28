@@ -27,11 +27,13 @@ class MoveValidator {
         return _isValidRookMove(from, to, board);
       case PieceType.bishop:
         return _isValidBishopMove(from, to, board);
-      default:
-        break;
+      case PieceType.knight:
+        return _isValidKnightMove(from, to, board);
+      case PieceType.queen:
+        return _isValidQueenMove(from, to, board);
+      case PieceType.king:
+        return _isValidKingMove(from, to, board);
     }
-
-    return true;
   }
 
   // Kiểm tra có đi đúng lượt không
@@ -131,5 +133,42 @@ class MoveValidator {
       }
     }
     return true;
+  }
+
+  // Kiểm tra nước đi của quân mã
+  bool _isValidKnightMove(SquareModel from, SquareModel to, BoardModel board) {
+    // Tập hợp các nước đi hợp lệ
+    final validMoves = [
+      [2, 1],
+      [2, -1],
+      [-2, 1],
+      [-2, -1],
+      [1, 2],
+      [1, -2],
+      [-1, 2],
+      [-1, -2],
+    ];
+
+    for (var move in validMoves) {
+      if (to.row == from.row + move[0] && to.column == from.column + move[1]) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  // Kiểm tra logic nước đi quân Hậu
+  bool _isValidQueenMove(SquareModel from, SquareModel to, BoardModel board) {
+    // Hậu có thể di chuyển như quân Xe hoặc quân Tượng
+    return _isValidRookMove(from, to, board) ||
+        _isValidBishopMove(from, to, board);
+  }
+
+  // Kiểm tra nước đi quân Vua
+  bool _isValidKingMove(SquareModel from, SquareModel to, BoardModel board) {
+    // Vua di chuyển tối đa 1 ô theo mọi hướng
+    return (from.row - to.row).abs() <= 1 &&
+        (from.column - to.column).abs() <= 1;
   }
 }
