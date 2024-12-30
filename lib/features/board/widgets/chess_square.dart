@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import '../models/square_model.dart';
 import '../models/piece_model.dart';
@@ -19,8 +21,10 @@ class ChessSquare extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: square.color == "white" ? Colors.grey : Colors.green,
-          border: Border.all(color: Colors.grey),
+          color: square.color == "white"
+              ? const Color(0xFF769655)
+              : const Color(0xFFEEEED2),
+          border: Border.all(color: Colors.transparent),
         ),
         child: _buildPiece(),
       ),
@@ -35,33 +39,16 @@ class ChessSquare extends StatelessWidget {
     }
 
     return Center(
-      child: Text(
-        _pieceSymbol(square.piece!),
-        style: TextStyle(
-          color: square.piece!.color == PieceColor.white
-              ? Colors.white
-              : Colors.black,
-          fontSize: 24.0,
-        ),
+      child: Image.asset(
+        _getPieceImagePath(square.piece!),
+        width: 40.0,
+        height: 40.0,
+        fit: BoxFit.contain,
       ),
     );
   }
 
-  /// Lấy ký hiệu quân cờ từ model
-  String _pieceSymbol(PieceModel piece) {
-    switch (piece.type) {
-      case PieceType.king:
-        return piece.color == PieceColor.white ? '♔' : '♚';
-      case PieceType.queen:
-        return piece.color == PieceColor.white ? '♕' : '♛';
-      case PieceType.rook:
-        return piece.color == PieceColor.white ? '♖' : '♜';
-      case PieceType.bishop:
-        return piece.color == PieceColor.white ? '♗' : '♝';
-      case PieceType.knight:
-        return piece.color == PieceColor.white ? '♘' : '♞';
-      case PieceType.pawn:
-        return piece.color == PieceColor.white ? '♙' : '♟';
-    }
+  String _getPieceImagePath(PieceModel piece) {
+    return "assets/pieces/${piece.color.name}_${piece.type.name}.png";
   }
 }
