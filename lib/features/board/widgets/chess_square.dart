@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import '../models/square_model.dart';
 import '../models/piece_model.dart';

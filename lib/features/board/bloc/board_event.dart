@@ -22,3 +22,11 @@ class SquareTappedEvent extends BoardEvent {
   @override
   List<Object?> get props => [selectedSquare];
 }
+
+class MovingBackEvent extends BoardEvent {
+  const MovingBackEvent();
+}
+
+class MovingForwardEvent extends BoardEvent {
+  const MovingForwardEvent();
+}
