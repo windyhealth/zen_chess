@@ -2,6 +2,14 @@ part of 'board_bloc.dart';
 
 enum PlayerTurn { white, black }
 
+enum CheckStatus {
+  none,
+  whiteKingInCheck,
+  blackKingInCheck,
+  whiteInCheckMate,
+  blackInCheckMate
+}
+
 final class BoardState extends Equatable {
   const BoardState({
     this.board = const BoardModel(squares: []),
@@ -10,6 +18,7 @@ final class BoardState extends Equatable {
     this.playerTurn = PlayerTurn.white,
     this.movesHistory = const [],
     this.historyIndex,
+    this.checkStatus,
   });
 
   final BoardModel board;
@@ -18,10 +27,17 @@ final class BoardState extends Equatable {
   final SquareModel? selectedSquare;
   final List<MoveModel> movesHistory;
   final int? historyIndex;
+  final CheckStatus? checkStatus;
 
   @override
-  List<Object?> get props =>
-      [board, isLoaded, selectedSquare, movesHistory, historyIndex];
+  List<Object?> get props => [
+        board,
+        isLoaded,
+        selectedSquare,
+        movesHistory,
+        historyIndex,
+        checkStatus
+      ];
 
   BoardState copyWith({
     BoardModel? board,
@@ -30,6 +46,7 @@ final class BoardState extends Equatable {
     PlayerTurn? playerTurn,
     List<MoveModel>? movesHistory,
     int? historyIndex,
+    CheckStatus? checkStatus,
   }) {
     return BoardState(
       board: board ?? this.board,
@@ -38,6 +55,7 @@ final class BoardState extends Equatable {
       playerTurn: playerTurn ?? this.playerTurn,
       movesHistory: movesHistory ?? this.movesHistory,
       historyIndex: historyIndex ?? this.historyIndex,
+      checkStatus: checkStatus ?? this.checkStatus,
     );
   }
 }

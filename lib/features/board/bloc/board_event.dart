@@ -30,3 +30,7 @@ class MovingBackEvent extends BoardEvent {
 class MovingForwardEvent extends BoardEvent {
   const MovingForwardEvent();
 }
+
+class CheckKingInCheckEvent extends BoardEvent {
+  const CheckKingInCheckEvent();
+}

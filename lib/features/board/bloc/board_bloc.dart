@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:zenchess/features/board/models/check_validator.dart';
+import 'package:zenchess/features/board/models/piece_model.dart';
 
 import '../models/board_model.dart';
 import '../models/square_model.dart';
@@ -16,6 +18,7 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
     on<SquareTappedEvent>(_onSquareTapped);
     on<MovingBackEvent>(_onMovingBack);
     on<MovingForwardEvent>(_onMovingForward);
+    on<CheckKingInCheckEvent>(_onCheckKingInCheck);
   }
 
   /// Xử lý sự kiện LoadBoardEvent
@@ -30,6 +33,12 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
 
   /// Xử lý sự kiện SquareTappedEvent
   void _onSquareTapped(SquareTappedEvent event, Emitter<BoardState> emit) {
+    // Kiểm tra ván cờ đã kết thúc (checkmate)
+    if (state.checkStatus == CheckStatus.blackInCheckMate ||
+        state.checkStatus == CheckStatus.whiteInCheckMate) {
+      return;
+    }
+
     // Trường hợp đang xem lại nước đi cũ
     if (state.historyIndex != null &&
         state.historyIndex! < state.movesHistory.length - 1) return;
@@ -68,6 +77,15 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
       BoardModel newBoard =
           _onMovingPiece(state.selectedSquare!, event.selectedSquare);
 
+      // Kiểm tra nước đi có thoát khỏi check
+      if (CheckValidator.instance.isKingInCheck(
+          state.playerTurn == PlayerTurn.white
+              ? PieceColor.white
+              : PieceColor.black,
+          newBoard)) {
+        return;
+      }
+
       // Lịch sử nước đi
       MoveModel move = MoveModel(
         piece: state.selectedSquare!.piece!,
@@ -87,6 +105,8 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
           movesHistory: List.from(state.movesHistory)..add(move),
         ),
       );
+
+      add(const CheckKingInCheckEvent());
     }
   }
 
@@ -149,9 +169,6 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
         historyIndex: historyIndex == 0 ? 0 : historyIndex - 1,
       ),
     );
-
-    print('historyIndex = $historyIndex');
-    print('historyIndex state = ${state.historyIndex}');
   }
 
   // Xử lý sự kiện MovingForwardEvent
@@ -187,8 +204,44 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
           ? historyIndex
           : historyIndex + 1,
     ));
+  }
 
-    print('historyIndex = $historyIndex');
-    print('historyIndex state = ${state.historyIndex}');
+  // Kiểm tra trạng thái check
+  void _onCheckKingInCheck(
+      CheckKingInCheckEvent event, Emitter<BoardState> emit) {
+    // Check in check
+    bool isInCheck = CheckValidator.instance.isKingInCheck(
+        state.playerTurn == PlayerTurn.white
+            ? PieceColor.white
+            : PieceColor.black,
+        state.board);
+    if (isInCheck) {
+      // Check in checkmate
+      bool isInCheckMate = CheckValidator.instance.isCheckMate(
+          state.playerTurn == PlayerTurn.white
+              ? PieceColor.white
+              : PieceColor.black,
+          state.board);
+
+      if (isInCheckMate) {
+        emit(state.copyWith(
+          checkStatus: state.playerTurn == PlayerTurn.white
+              ? CheckStatus.whiteInCheckMate
+              : CheckStatus.blackInCheckMate,
+        ));
+      } else {
+        emit(state.copyWith(
+          checkStatus: state.playerTurn == PlayerTurn.white
+              ? CheckStatus.whiteKingInCheck
+              : CheckStatus.blackKingInCheck,
+        ));
+      }
+    } else {
+      emit(
+        state.copyWith(
+          checkStatus: CheckStatus.none,
+        ),
+      );
+    }
   }
 }

@@ -8,11 +8,8 @@ class ZenChessApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => BoardBloc(),
-      child: MaterialApp.router(
-        routerConfig: myRouter,
-      ),
+    return MaterialApp.router(
+      routerConfig: myRouter,
     );
   }
 }
