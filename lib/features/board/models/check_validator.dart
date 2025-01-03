@@ -27,9 +27,6 @@ class CheckValidator {
     // Kiểm tra các nước đi của đối phương
     for (var row in board.squares) {
       for (var square in row) {
-        if (square.piece != null && square.piece!.type == PieceType.queen) {
-          print('queen here $square');
-        }
         if (square.piece != null &&
             square.piece!.color != kingColor &&
             MoveValidator.instance.isValidMove(
@@ -51,11 +48,10 @@ class CheckValidator {
   bool isCheckMate(PieceColor kingColor, BoardModel board) {
     if (!isKingInCheck(kingColor, board)) return false;
 
+    // Kiểm tra tất cả các nước đi của vua và đồng minh
     for (var row in board.squares) {
       for (var square in row) {
-        if (square.piece != null &&
-            square.piece!.color == kingColor &&
-            square.piece!.type == PieceType.king) {
+        if (square.piece != null && square.piece!.color == kingColor) {
           // Giả lập tất các nước đi hợp lệ và kiểm tra vẫn còn bị chiếu hay không
           for (var targetRow in board.squares) {
             for (var targetSquare in targetRow) {
@@ -67,12 +63,14 @@ class CheckValidator {
                       : PlayerTurn.black,
                   board)) {
                 // Giả lập nước đi
-                var simulatedBoard = board
-                    .updateSquare(square.copyWith(piece: null))
+                BoardModel simulatedBoard =
+                    board.updateSquare(square.copyWith(piece: null));
+
+                simulatedBoard = simulatedBoard
                     .updateSquare(targetSquare.copyWith(piece: square.piece));
 
-                // Kiểm tra nếu vua vẫn bị chiếu
-                if (!isKingInCheck(kingColor, simulatedBoard)) {
+                // Kiểm tra vua đã thoát chiếu chưa
+                if (isKingInCheck(kingColor, simulatedBoard) == false) {
                   return false;
                 }
               }

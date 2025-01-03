@@ -106,7 +106,9 @@ class BoardBloc extends Bloc<BoardEvent, BoardState> {
         ),
       );
 
-      add(const CheckKingInCheckEvent());
+      Future.delayed(const Duration(milliseconds: 300), () {
+        add(const CheckKingInCheckEvent());
+      });
     }
   }
 

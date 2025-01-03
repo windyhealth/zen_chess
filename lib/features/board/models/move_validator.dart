@@ -9,10 +9,16 @@ class MoveValidator {
   MoveValidator._privatedConstructor();
 
   /// Kiểm tra xem nước đi có hợp lệ hay không
-  bool isValidMove(SquareModel from, SquareModel to, PlayerTurn playerTurn,
-      BoardModel board) {
+  bool isValidMove(SquareModel fromSquare, SquareModel toSquare,
+      PlayerTurn playerTurn, BoardModel board) {
+    SquareModel from = board.getSquare(fromSquare.row, fromSquare.column)!;
+    SquareModel to = board.getSquare(toSquare.row, toSquare.column)!;
+
     // Kiểm tra trong from có quân cờ không
     if (!from.hasPiece) return false;
+
+    // Kiểm tra trong target có quân đồng minh không
+    if (_isTargetAlly(from, to)) return false;
 
     // Kiểm tra có đi đúng lượt không
     if (!_isValidPlayerTurn(from.piece!, playerTurn)) return false;
@@ -41,6 +47,13 @@ class MoveValidator {
     } else {
       return false;
     }
+  }
+
+  // Kiểm tra target có chứa đồng minh không
+  bool _isTargetAlly(SquareModel from, SquareModel to) {
+    if (!to.hasPiece) return false;
+
+    return from.piece!.color == to.piece!.color;
   }
 
   // Kiểm tra logic nước đi của quân tốt

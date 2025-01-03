@@ -29,7 +29,7 @@ class SquareModel extends Equatable {
       row: row ?? this.row,
       column: column ?? this.column,
       color: color ?? this.color,
-      piece: piece ?? this.piece,
+      piece: piece,
     );
   }
 
