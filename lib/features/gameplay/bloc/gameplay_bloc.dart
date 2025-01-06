@@ -1,56 +1,40 @@
-import 'dart:async';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import '../../board/bloc/board_bloc.dart';
-import '../../board/models/board_model.dart';
-import '../../board/models/piece_model.dart';
 
 part 'gameplay_event.dart';
 part 'gameplay_state.dart';
 
 class GameplayBloc extends Bloc<GameplayEvent, GameplayState> {
-  final BoardBloc boardBloc;
-  late final StreamSubscription boardSubscription;
+  GameplayBloc() : super(const GameplayState()) {
+    on<PrepareGameEvent>(_onPrepareGame);
+    on<StartGameEvent>(_onStartGame);
+    on<PlayerOneMoveEvent>(_onPlayerOneMove);
+    on<PlayerTwoMoveEvent>(_onPlayerTwoMove);
 
-  GameplayBloc({required this.boardBloc})
-      : super(GameplayState(board: boardBloc.state.board)) {
-    on<StartNewGameEvent>(_onStartNewGame);
-    on<PauseGameEvent>(_onPauseGame);
-    on<ResumeGameEvent>(_onResumeGame);
-    on<EndGameEvent>(_onEndGame);
-
-    boardSubscription = boardBloc.stream.listen((boardState) {
-      add(BoardUpdatedEvent(boardState.board));
-    });
+    add(const PrepareGameEvent());
   }
 
-  void _onStartNewGame(StartNewGameEvent event, Emitter<GameplayState> emit) {
-    boardBloc.add(const LoadBoardEvent());
+  void _onPrepareGame(
+      PrepareGameEvent event, Emitter<GameplayState> emit) async {
+    await Future.delayed(const Duration(seconds: 3), () {});
+    add(const StartGameEvent());
+  }
+
+  void _onStartGame(StartGameEvent event, Emitter<GameplayState> emit) {
     emit(state.copyWith(
-      status: GameplayStatus.inProgress,
-      currentPlayer: "white",
+      gameStatus: GameStatus.playing,
     ));
   }
 
-  void _onPauseGame(PauseGameEvent event, Emitter<GameplayState> emit) {
-    emit(state.copyWith(status: GameplayStatus.paused));
-  }
-
-  void _onResumeGame(ResumeGameEvent event, Emitter<GameplayState> emit) {
-    emit(state.copyWith(status: GameplayStatus.inProgress));
-  }
-
-  void _onEndGame(EndGameEvent event, Emitter<GameplayState> emit) {
+  void _onPlayerOneMove(PlayerOneMoveEvent event, Emitter<GameplayState> emit) {
     emit(state.copyWith(
-      status: GameplayStatus.completed,
-      result: event.result,
-    ));
+        playerTurn:
+            state.playerTurn == Player.white ? Player.black : Player.white));
   }
 
-  @override
-  Future<void> close() {
-    boardSubscription.cancel();
-    return super.close();
+  void _onPlayerTwoMove(PlayerTwoMoveEvent event, Emitter<GameplayState> emit) {
+    emit(state.copyWith(
+        playerTurn:
+            state.playerTurn == Player.white ? Player.black : Player.white));
   }
 }

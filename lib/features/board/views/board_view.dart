@@ -8,7 +8,13 @@ import '../widgets/chess_square.dart';
 
 /// Giao diện hiển thị bàn cờ
 class BoardView extends StatelessWidget {
-  const BoardView({super.key});
+  final bool outsideHandle;
+  final Function(SquareModel)? onSelectSquare;
+  const BoardView({
+    super.key,
+    this.outsideHandle = false,
+    this.onSelectSquare,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -57,8 +63,15 @@ class BoardView extends StatelessWidget {
   }
 
   /// Xử lý sự kiện khi một ô vuông được nhấn
-  void _onSquareTapped(BuildContext context, SquareModel square) =>
+  void _onSquareTapped(BuildContext context, SquareModel square) {
+    if (outsideHandle) {
+      if (onSelectSquare != null) {
+        onSelectSquare!(square);
+      }
+    } else {
       context.read<BoardBloc>().add(
             SquareTappedEvent(selectedSquare: square),
           );
+    }
+  }
 }

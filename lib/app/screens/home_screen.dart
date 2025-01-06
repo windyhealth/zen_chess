@@ -25,9 +25,15 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           TextButton(
-            onPressed: () => context.push('/game'),
+            onPressed: () => context.push('/two-players'),
             child: const Text(
-              "Open Game",
+              "Two Players",
+            ),
+          ),
+          TextButton(
+            onPressed: () => context.push('/play-with-ai'),
+            child: const Text(
+              "Play with AI",
             ),
           ),
         ],

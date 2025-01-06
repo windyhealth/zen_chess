@@ -4,21 +4,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/board/bloc/board_bloc.dart';
 import '../../features/board/views/board_view.dart';
 
-class GameScreen extends StatefulWidget {
-  const GameScreen({super.key});
+class TwoPlayersGameScreen extends StatefulWidget {
+  const TwoPlayersGameScreen({super.key});
 
   @override
-  State<GameScreen> createState() => _GameScreenState();
+  State<TwoPlayersGameScreen> createState() => _TwoPlayersGameScreenState();
 }
 
-class _GameScreenState extends State<GameScreen> {
+class _TwoPlayersGameScreenState extends State<TwoPlayersGameScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => BoardBloc(),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Game"),
+          title: const Text("Two Players"),
         ),
         body: main(),
       ),
@@ -30,9 +30,7 @@ class _GameScreenState extends State<GameScreen> {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: chessBoard(),
-        ),
+        chessBoard(),
         controllerButtons(),
       ],
     );
