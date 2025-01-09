@@ -7,16 +7,24 @@ class SquareModel extends Equatable {
   final int column; // Cột của ô vuông
   final String color; // Màu sắc của ô vuông (ví dụ: "white" hoặc "black")
   final PieceModel? piece; // Quân cờ hiện tại trên ô (nếu có)
+  final bool isNull;
 
   const SquareModel({
     required this.row,
     required this.column,
     required this.color,
     this.piece,
+    this.isNull = true,
   });
 
   @override
-  List<Object?> get props => [row, column, color, piece];
+  List<Object?> get props => [
+        row,
+        column,
+        color,
+        piece,
+        isNull,
+      ];
 
   /// Tạo một bản sao của đối tượng với các thay đổi cụ thể
   SquareModel copyWith({
@@ -24,12 +32,14 @@ class SquareModel extends Equatable {
     int? column,
     String? color,
     PieceModel? piece,
+    bool? isNull,
   }) {
     return SquareModel(
       row: row ?? this.row,
       column: column ?? this.column,
       color: color ?? this.color,
-      piece: piece,
+      piece: piece ?? this.piece,
+      isNull: isNull ?? this.isNull,
     );
   }
 

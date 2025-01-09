@@ -10,7 +10,7 @@ enum CheckStatus {
   blackInCheckMate
 }
 
-final class BoardState extends Equatable {
+class BoardState extends Equatable {
   const BoardState({
     this.board = const BoardModel(squares: []),
     this.selectedSquare,
@@ -19,6 +19,19 @@ final class BoardState extends Equatable {
     this.movesHistory = const [],
     this.historyIndex,
     this.checkStatus,
+    this.fromSquare = const SquareModel(
+      row: -1,
+      column: -1,
+      color: '',
+      isNull: true,
+    ),
+    this.toSquare = const SquareModel(
+      row: -1,
+      column: -1,
+      color: '',
+      isNull: true,
+    ),
+    this.move,
   });
 
   final BoardModel board;
@@ -28,6 +41,9 @@ final class BoardState extends Equatable {
   final List<MoveModel> movesHistory;
   final int? historyIndex;
   final CheckStatus? checkStatus;
+  final SquareModel fromSquare;
+  final SquareModel toSquare;
+  final MoveModel? move;
 
   @override
   List<Object?> get props => [
@@ -36,7 +52,10 @@ final class BoardState extends Equatable {
         selectedSquare,
         movesHistory,
         historyIndex,
-        checkStatus
+        checkStatus,
+        fromSquare,
+        toSquare,
+        move,
       ];
 
   BoardState copyWith({
@@ -47,6 +66,9 @@ final class BoardState extends Equatable {
     List<MoveModel>? movesHistory,
     int? historyIndex,
     CheckStatus? checkStatus,
+    SquareModel? fromSquare,
+    SquareModel? toSquare,
+    MoveModel? move,
   }) {
     return BoardState(
       board: board ?? this.board,
@@ -56,6 +78,23 @@ final class BoardState extends Equatable {
       movesHistory: movesHistory ?? this.movesHistory,
       historyIndex: historyIndex ?? this.historyIndex,
       checkStatus: checkStatus ?? this.checkStatus,
+      fromSquare: fromSquare ?? this.fromSquare,
+      toSquare: toSquare ?? this.toSquare,
+      move: move ?? this.move,
     );
   }
+}
+
+class NextPlayerTurnState extends BoardState {
+  const NextPlayerTurnState({
+    required super.board,
+    required super.isLoaded,
+    required super.playerTurn,
+    required super.movesHistory,
+    required super.historyIndex,
+    required super.checkStatus,
+    required super.fromSquare,
+    required super.toSquare,
+    required super.move,
+  });
 }

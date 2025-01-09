@@ -82,6 +82,7 @@ class BoardModel extends Equatable {
             column: column,
             color: (row + column) % 2 == 0 ? 'white' : 'black',
             piece: piece,
+            isNull: false,
           );
         },
       ),

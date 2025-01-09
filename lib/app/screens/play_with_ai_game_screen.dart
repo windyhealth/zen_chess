@@ -24,7 +24,17 @@ class PlayWithAIGameScreen extends StatelessWidget {
           appBar: AppBar(
             title: const Text("Play With AI"),
           ),
-          body: main(context),
+          body: MultiBlocListener(
+            listeners: [
+              BlocListener<BoardBloc, BoardState>(listener: (context, state) {
+                if (state is NextPlayerTurnState &&
+                    state.playerTurn.name == PlayerTurn.black.name) {
+                  _aiTurn(context);
+                }
+              })
+            ],
+            child: main(context),
+          ),
         );
       }),
     );
@@ -47,7 +57,7 @@ class PlayWithAIGameScreen extends StatelessWidget {
   Widget board(BuildContext context) {
     return BoardView(
       outsideHandle: true,
-      onSelectSquare: (square) {
+      onSelectSquare: (square) async {
         final boardState = context.read<BoardBloc>().state;
         final gameplayState = context.read<GameplayBloc>().state;
 
@@ -57,21 +67,6 @@ class PlayWithAIGameScreen extends StatelessWidget {
           context
               .read<BoardBloc>()
               .add(SquareTappedEvent(selectedSquare: square));
-
-          // Nếu người chơi hoàn thành xong thì đổi lượt ai
-
-          // Lấy nước đi từ AI model
-
-          List<List<int>> moves =
-              AIService.instance.getMove(board: '', playerTurn: '');
-
-          context.read<BoardBloc>().add(SquareTappedEvent(
-              selectedSquare:
-                  boardState.board.getSquare(moves[0][0], moves[0][1])!));
-
-          context.read<BoardBloc>().add(SquareTappedEvent(
-              selectedSquare:
-                  boardState.board.getSquare(moves[1][0], moves[1][1])!));
         }
       },
     );
@@ -83,5 +78,22 @@ class PlayWithAIGameScreen extends StatelessWidget {
         "${state.gameStatus.name} - ${state.playerTurn}",
       );
     });
+  }
+
+  Future<void> _aiTurn(BuildContext context) async {
+    final boardState = context.read<BoardBloc>().state;
+    final gameplayState = context.read<GameplayBloc>().state;
+
+    // Lấy nước đi từ AI model
+    if (boardState.playerTurn.name == gameplayState.playerTwo.name) {
+      List<SquareModel> moves = await AIService.instance.getMove(
+          board: boardState.board, playerTurn: gameplayState.playerTwo.name);
+
+      if (moves.length == 2) {
+        final boardBloc = BlocProvider.of<BoardBloc>(context);
+        boardBloc.add(SquareTappedEvent(selectedSquare: moves[0]));
+        boardBloc.add(SquareTappedEvent(selectedSquare: moves[1]));
+      }
+    }
   }
 }

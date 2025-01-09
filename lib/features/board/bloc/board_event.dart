@@ -23,6 +23,21 @@ class SquareTappedEvent extends BoardEvent {
   List<Object?> get props => [selectedSquare];
 }
 
+/// Sự kiện di chuyển quân cờ
+class MovingPieceEvent extends BoardEvent {
+  const MovingPieceEvent();
+}
+
+/// Lưu lịch sử di chuyển
+class SaveHistoryMoveEvent extends BoardEvent {
+  const SaveHistoryMoveEvent();
+}
+
+/// Thay đổi lượt đi
+class NextPlayerTurnEvent extends BoardEvent {
+  const NextPlayerTurnEvent();
+}
+
 class MovingBackEvent extends BoardEvent {
   const MovingBackEvent();
 }
